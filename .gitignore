@@ -1,0 +1,17 @@
+# Keil build output
+*.o
+*.d
+*.crf
+*.axf
+*.map
+*.htm
+*.lnp
+*.dep
+
+# Keil user files
+*.uvguix.*
+*.uvoptx
+
+# Build folders
+Listings/
+Objects/
