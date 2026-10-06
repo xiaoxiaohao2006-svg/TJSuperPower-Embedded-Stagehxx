@@ -107,12 +107,16 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
+ while (1)
+{
+  /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-  }
+  /* USER CODE BEGIN 3 */
+  HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
+  HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_7);
+  HAL_Delay(500);
+  /* USER CODE END 3 */
+}
   /* USER CODE END 3 */
 }
 
