@@ -257,6 +257,12 @@ HAL_StatusTypeDef bmi088_init(void)
   HAL_Delay(50);
 
   bmi088_acceleration_write_register(
+    0x7C,
+    0x00);
+
+HAL_Delay(1);
+
+  bmi088_acceleration_write_register(
       BMI088_ACCEL_CONFIG_REGISTER,
       BMI088_ACCEL_CONFIG_VALUE);
 

@@ -110,7 +110,10 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
-bmi088_init();
+if (bmi088_init() != HAL_OK)
+{
+    Error_Handler();
+}
 HAL_UART_Receive_DMA(&huart3, dt7_rx_buffer, 18);
   /* USER CODE END 2 */
 
@@ -119,7 +122,7 @@ HAL_UART_Receive_DMA(&huart3, dt7_rx_buffer, 18);
  while (1)
 {
   dt7_parse_data();
-  
+
   bmi088_read_data(&bmi088_data);
 bmi088_print_data();
 HAL_Delay(100);
