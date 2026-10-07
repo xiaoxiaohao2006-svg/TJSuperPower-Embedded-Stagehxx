@@ -106,6 +106,7 @@ int main(void)
   MX_CAN1_Init();
   MX_SPI1_Init();
   MX_TIM4_Init();
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   MX_USART3_UART_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
@@ -130,9 +131,13 @@ HAL_Delay(100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
-  HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_7);
-  HAL_Delay(500);
+ HAL_GPIO_WritePin(GPIOF, GPIO_PIN_14, GPIO_PIN_SET);
+HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+HAL_Delay(500);
+
+HAL_GPIO_WritePin(GPIOF, GPIO_PIN_14, GPIO_PIN_RESET);
+HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+HAL_Delay(500);
   /* USER CODE END 3 */
 }
 }
