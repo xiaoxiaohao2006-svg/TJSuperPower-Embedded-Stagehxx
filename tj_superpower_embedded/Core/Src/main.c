@@ -52,6 +52,8 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 Bmi088Data bmi088_data;
+uint8_t dt7_rx_buffer[18];
+Dt7Data dt7_data;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -64,6 +66,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 void bmi088_print_data(void);
+void dt7_parse_data(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -108,12 +111,15 @@ int main(void)
   /* USER CODE BEGIN 2 */
 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
 bmi088_init();
+HAL_UART_Receive_DMA(&huart3, dt7_rx_buffer, 18);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
  while (1)
 {
+  dt7_parse_data();
+  
   bmi088_read_data(&bmi088_data);
 bmi088_print_data();
 HAL_Delay(100);
@@ -446,6 +452,39 @@ void bmi088_print_data(void)
       bmi088_data.angular_velocity_z);
 
   HAL_UART_Transmit(&huart1, (uint8_t *)buffer, length, 100);
+}
+
+void dt7_parse_data(void)
+{
+  dt7_data.channel_1 =
+      ((dt7_rx_buffer[1] | dt7_rx_buffer[2] << 8) & 0x07FF) - 1024;
+
+  dt7_data.channel_2 =
+      (((dt7_rx_buffer[2] >> 3) | dt7_rx_buffer[3] << 5) & 0x07FF) - 1024;
+
+  dt7_data.channel_3 =
+      (((dt7_rx_buffer[3] >> 6) |
+        (dt7_rx_buffer[4] << 2) |
+        (dt7_rx_buffer[5] << 10)) & 0x07FF) - 1024;
+
+  dt7_data.channel_4 =
+      (((dt7_rx_buffer[5] >> 1) |
+        (dt7_rx_buffer[6] << 7)) & 0x07FF) - 1024;
+
+  dt7_data.channel_5 =
+      ((dt7_rx_buffer[7] | dt7_rx_buffer[8] << 8) & 0x07FF) - 1024;
+
+  dt7_data.channel_6 =
+      (((dt7_rx_buffer[8] >> 3) | dt7_rx_buffer[9] << 5) & 0x07FF) - 1024;
+
+  dt7_data.channel_7 =
+      (((dt7_rx_buffer[9] >> 6) |
+        (dt7_rx_buffer[10] << 2) |
+        (dt7_rx_buffer[11] << 10)) & 0x07FF) - 1024;
+
+  dt7_data.channel_8 =
+      (((dt7_rx_buffer[11] >> 1) |
+        (dt7_rx_buffer[12] << 7)) & 0x07FF) - 1024;
 }
 /* USER CODE END 4 */
 
