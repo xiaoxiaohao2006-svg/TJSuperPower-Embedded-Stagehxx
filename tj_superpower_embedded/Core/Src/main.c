@@ -106,11 +106,15 @@ int main(void)
   MX_CAN1_Init();
   MX_SPI1_Init();
   MX_TIM4_Init();
-  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   MX_USART3_UART_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
+
+__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 125);
+HAL_Delay(200);
+__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 0);
+
 if (bmi088_init() != HAL_OK)
 {
     Error_Handler();
