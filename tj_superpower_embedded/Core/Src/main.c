@@ -72,6 +72,32 @@ void dt7_parse_data(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void CAN1_Send(uint32_t id, uint8_t *data, uint8_t len)
+{
+    CAN_TxHeaderTypeDef tx_header;
+    uint32_t tx_mailbox;
+
+    tx_header.StdId = id;
+    tx_header.ExtId = 0;
+    tx_header.IDE = CAN_ID_STD;
+    tx_header.RTR = CAN_RTR_DATA;
+    tx_header.DLC = len;
+    tx_header.TransmitGlobalTime = DISABLE;
+
+    if (HAL_CAN_AddTxMessage(&hcan1, &tx_header, data, &tx_mailbox) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+
+void CAN1_StartReceive(void)
+{
+    if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -108,7 +134,7 @@ int main(void)
   MX_TIM4_Init();
   MX_USART3_UART_Init();
   MX_USART1_UART_Init();
-  /* USER CODE BEGIN 2 */
+  /* USER CODE BEGIN 2 */ 
 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
 
 __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 125);
@@ -120,6 +146,7 @@ if (bmi088_init() != HAL_OK)
     Error_Handler();
 }
 HAL_UART_Receive_DMA(&huart3, dt7_rx_buffer, 18);
+CAN1_StartReceive();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -223,6 +250,28 @@ static void MX_CAN1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN1_Init 2 */
+
+  CAN_FilterTypeDef can_filter;
+
+can_filter.FilterBank = 0;
+can_filter.FilterMode = CAN_FILTERMODE_IDMASK;
+can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
+can_filter.FilterIdHigh = 0x0000;
+can_filter.FilterIdLow = 0x0000;
+can_filter.FilterMaskIdHigh = 0x0000;
+can_filter.FilterMaskIdLow = 0x0000;
+can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+can_filter.FilterActivation = ENABLE;
+
+if (HAL_CAN_ConfigFilter(&hcan1, &can_filter) != HAL_OK)
+{
+    Error_Handler();
+}
+
+if (HAL_CAN_Start(&hcan1) != HAL_OK)
+{
+    Error_Handler();
+}
 
   /* USER CODE END CAN1_Init 2 */
 
