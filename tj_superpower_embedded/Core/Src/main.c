@@ -21,7 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "bmi088.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,7 +51,7 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-
+Bmi088Data bmi088_data;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,7 +63,7 @@ static void MX_TIM4_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+void bmi088_print_data(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -106,12 +107,17 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
+bmi088_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
  while (1)
 {
+  bmi088_read_data(&bmi088_data);
+bmi088_print_data();
+HAL_Delay(100);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -424,7 +430,23 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void bmi088_print_data(void)
+{
+  char buffer[128];
 
+  int length = snprintf(
+      buffer,
+      sizeof(buffer),
+      "ACC: %d %d %d | GYRO: %d %d %d\r\n",
+      bmi088_data.acceleration_x,
+      bmi088_data.acceleration_y,
+      bmi088_data.acceleration_z,
+      bmi088_data.angular_velocity_x,
+      bmi088_data.angular_velocity_y,
+      bmi088_data.angular_velocity_z);
+
+  HAL_UART_Transmit(&huart1, (uint8_t *)buffer, length, 100);
+}
 /* USER CODE END 4 */
 
 /**
